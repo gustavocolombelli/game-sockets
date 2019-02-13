@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<style>
+    body {
+        background: linear-gradient(18deg, hsl(255,275%,250%) 0%, hsl(196,25%,50%) 100%);
+        background-size: 100vw 100vh;
+    }
+    div {
+        position: fixed;
+        font-size: 18px;
+    }
+</style>
+<head>
+    <title></title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+</head>
+<body>
+<h4>Socket.io</h4>
+<div>o</div>
+
+
+<script>
+    const pos = {x:0, y:0, id:0};
+    const socket = io();
+    socket.on('connect', function () {
+        $("#msgs").append("conectado com o id: " + socket.id);
+        socket.emit('msg', 'estou conectado: ' + socket.id);
+    });
+
+    socket.on('msg', function (msg) {
+        $("#msgs").append('<br>' + msg);
+        console.log('outro usuario: ',msg);
+        console.log(msg.x);
+
+
+    });
+
+    pos.id = socket.id;
+    console.log(socket.id);
+    var up = false,
+        right = false,
+        down = false,
+        left = false,
+        x = window.innerWidth/2-130/2;
+        y = window.innerHeight/2-130/2;
+    document.addEventListener('keydown',press);
+    function press(e){
+        if (e.keyCode === 38 /* up */ || e.keyCode === 87 /* w */ || e.keyCode === 90 /* z */){
+            up = true
+        }
+        if (e.keyCode === 39 /* right */ || e.keyCode === 68 /* d */){
+            right = true
+        }
+        if (e.keyCode === 40 /* down */ || e.keyCode === 83 /* s */){
+            down = true
+        }
+        if (e.keyCode === 37 /* left */ || e.keyCode === 65 /* a */ || e.keyCode === 81 /* q */){
+            left = true
+        }
+    }
+    document.addEventListener('keyup',release)
+    function release(e){
+        if (e.keyCode === 38 /* up */ || e.keyCode === 87 /* w */ || e.keyCode === 90 /* z */){
+            up = false
+        }
+        if (e.keyCode === 39 /* right */ || e.keyCode === 68 /* d */){
+            right = false
+        }
+        if (e.keyCode === 40 /* down */ || e.keyCode === 83 /* s */){
+            down = false
+        }
+        if (e.keyCode === 37 /* left */ || e.keyCode === 65 /* a */ || e.keyCode === 81 /* q */){
+            left = false
+        }
+    }
+    function gameLoop(){
+        var div = document.querySelector('div');
+        if (up){
+            y = y - 10
+        }
+        if (right){
+            x = x + 10
+        }
+        if (down){
+            y = y + 10
+        }
+        if (left){
+            x = x - 10
+        }
+        div.style.left = x+'px';
+        div.style.top = y+'px';
+        window.requestAnimationFrame(gameLoop);
+        console.log(x,y);
+        pos.x=x;pos.y=y;
+        socket.emit('msg', pos);
+    }
+
+    window.requestAnimationFrame(gameLoop)
+
+</script>
+</body>
+</html>
