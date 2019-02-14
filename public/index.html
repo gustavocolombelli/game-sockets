@@ -1,29 +1,35 @@
 <!DOCTYPE html>
-<html>
 <style>
-    body {
-        /*background: linear-gradient(18deg, hsl(255,275%,250%) 0%, hsl(196,25%,50%) 100%);*/
-        background: steelblue;
-        background-size: 100vw 100vh;
-    }
-    div {
-        position: fixed;
-        font-size: 18px;
+    canvas {
+        padding: 0;
+        margin: auto;
+        display: block;
+        width: 1024px;
+        height: 768px;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
     }
 </style>
+<html>
+
 <head>
-
-    <title>Sockets</title>
-
-
+    <meta charset="utf-8">
+    <script src="js/phaser3.js"></script>
 </head>
 <body>
+<canvas id="game-area"></canvas>
 
-<div>o</div>
-
-<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <script src="/socket.io/socket.io.js"></script>
+
+<script src="js/datgui.js"></script>
 <script src="js/jogo.js"></script>
 
+
 </body>
+
 </html>

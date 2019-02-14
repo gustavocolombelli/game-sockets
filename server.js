@@ -28,7 +28,7 @@ io.on('connection', (socket) => {
 
         console.log(contadorMovimentos++, jogadores[socket.id], socket.id);
         movimento.id = socket.id;
-        socket.broadcast.emit('movimento', movimento);
+        socket.broadcast.emit('movimento', jogadores);
     });
 
     socket.on('disconnect', () => {

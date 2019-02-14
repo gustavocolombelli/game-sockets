@@ -1,98 +1,72 @@
-const socket = io();
+var config = {
+    type: Phaser.CANVAS,
+    parent: 'phaser-example',
+    width: 1024,
+    height: 768,
+    physics: {
+        default: 'arcade',
+    },
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
+};
 
-let pos = {x: 0, y: 0};
-let posAtual = {x: 0, y: 0};
+
+var player;
 let posAnterior = {x: 0, y: 0};
 
-var up = false,
-    right = false,
-    down = false,
-    left = false,
-    x = window.innerWidth / 2 - 130 / 2;
-y = window.innerHeight / 2 - 130 / 2;
-posAtual.x = window.innerWidth / 2 - 130 / 2;
-posAtual.y = window.innerHeight / 2 - 130 / 2;
+var cursors;
+let keys;
 
-socket.on('connect', function () {
-    $("#msgs").append("conectado com o id: " + socket.id);
-    socket.emit('msg', 'estou conectado: ' + socket.id);
-});
+var game = new Phaser.Game(config);
+let socket = io();
 
-socket.on('msg', function (msg) {
-    $("#msgs").append('<br>' + msg);
-    console.log('outro usuario: ', msg);
-    console.log(msg.x);
-});
-
-
-document.addEventListener('keydown', press);
-
-function press(e) {
-    if (e.keyCode === 38 /* up */ || e.keyCode === 87 /* w */ || e.keyCode === 90 /* z */) {
-        up = true
-    }
-    if (e.keyCode === 39 /* right */ || e.keyCode === 68 /* d */) {
-        right = true
-    }
-    if (e.keyCode === 40 /* down */ || e.keyCode === 83 /* s */) {
-        down = true
-    }
-    if (e.keyCode === 37 /* left */ || e.keyCode === 65 /* a */ || e.keyCode === 81 /* q */) {
-        left = true
-    }
+function preload() {
+    this.load.image('bg', 'assets/graph-verde.png');
+    this.load.image('block', 'assets/formas-geometricas/ballBlue.png');
 }
 
-document.addEventListener('keyup', release);
+function create() {
 
-function release(e) {
-    if (e.keyCode === 38 /* up */ || e.keyCode === 87 /* w */ || e.keyCode === 90 /* z */) {
-        up = false
-    }
-    if (e.keyCode === 39 /* right */ || e.keyCode === 68 /* d */) {
-        right = false
-    }
-    if (e.keyCode === 40 /* down */ || e.keyCode === 83 /* s */) {
-        down = false
-    }
-    if (e.keyCode === 37 /* left */ || e.keyCode === 65 /* a */ || e.keyCode === 81 /* q */) {
-        left = false
-    }
+    //  Set the camera and physics bounds to be the size of 4x4 bg images
+    this.cameras.main.setBounds(0, 0, 1920, 1080);
+    this.physics.world.setBounds(0, 0, 1920, 1080);
+
+    //  Mash 4 images together to create our background
+    this.add.image(0, 0, 'bg').setOrigin(0);
+
+
+    cursors = this.input.keyboard.createCursorKeys();
+
+    player = this.physics.add.image(400, 300, 'block');
+
+    player.setCollideWorldBounds(true);
+
+    this.cameras.main.startFollow(player, true, 1, 1);
 }
 
-function gameLoop() {
-    var div = document.querySelector('div');
-
-    if (up) {
-        posAtual.y = posAtual.y - 10
+function update() {
+    player.setVelocity(0);
+    
+    if (cursors.left.isDown) {
+        player.setVelocityX(-500);
     }
-    if (right) {
-        posAtual.x = posAtual.x + 10
-    }
-    if (down) {
-        posAtual.y = posAtual.y + 10
-    }
-    if (left) {
-        posAtual.x = posAtual.x - 10
-    }
-    div.style.left = posAtual.x + 'px';
-    div.style.top = posAtual.y + 'px';
-    window.requestAnimationFrame(gameLoop);
-    //verificar posição anterior para não repitir envios iguais
-
-    //Verificar se a posição atual é diferente da anterior, caso forem iguais o envio é omitido ao servidor
-    if (posAnterior && (posAtual.x !== posAnterior.x || posAtual.y !== posAnterior.y)) {
-        //Emitir ao servidor a posição atual do jogador
-
-        console.log('POS ANTERIOR: ', posAnterior, 'POS ATUAL: ', posAtual);
-        socket.emit('movimento', posAtual);
+    else if (cursors.right.isDown) {
+        player.setVelocityX(500);
     }
 
-    posAnterior.x = posAtual.x;
-    posAnterior.y = posAtual.y;
-
+    if (cursors.up.isDown) {
+        player.setVelocityY(-500);
+    }
+    else if (cursors.down.isDown) {
+        player.setVelocityY(500);
+    }
+    console.log(player.x, player.y);
+    if (posAnterior && (player.x !== posAnterior.x || player.y !== posAnterior.y)) {
+        socket.emit('movimento', {x: player.x, y: player.y})
+    }
+    posAnterior.x = player.x;
+    posAnterior.y = player.y;
 }
-
-window.requestAnimationFrame(gameLoop);
-
-// console.log($(window).height());
-// console.log($(window).width());
