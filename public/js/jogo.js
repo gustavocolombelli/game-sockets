@@ -13,15 +13,18 @@ var config = {
     }
 };
 
-
 var player;
 let posAnterior = {x: 0, y: 0};
 
 var cursors;
-let keys;
+
 
 var game = new Phaser.Game(config);
 let socket = io();
+
+
+var keyObj;
+keyObj = scene.input.keyboard.addKey('W');  // Get key object
 
 function preload() {
     this.load.image('bg', 'assets/graph-verde.png');
@@ -38,6 +41,7 @@ function create() {
     this.add.image(0, 0, 'bg').setOrigin(0);
 
 
+
     cursors = this.input.keyboard.createCursorKeys();
 
     player = this.physics.add.image(400, 300, 'block');
@@ -45,11 +49,12 @@ function create() {
     player.setCollideWorldBounds(true);
 
     this.cameras.main.startFollow(player, true, 1, 1);
+
 }
 
 function update() {
     player.setVelocity(0);
-    
+
     if (cursors.left.isDown) {
         player.setVelocityX(-500);
     }
