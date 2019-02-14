@@ -9,7 +9,7 @@ const io = require('socket.io')(http);
 const porta = 80;
 const ip = "10.35.12.143";
 
-let contadorMovimentos=0;
+
 
 app.use(express.static(__dirname + '/public'));
 app.get('/', (req, res) => {
@@ -18,13 +18,13 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
+    let contadorMovimentos=0;
     console.log('novo cliente conectado', socket.id);
 
-    socket.on('msg', (msg) => {
-        console.log('---', contadorMovimentos++);
-        console.log(msg, socket.id);
+    socket.on('movimento', (msg) => {
+        console.log(contadorMovimentos++, msg, socket.id);
         msg.id = socket.id;
-        socket.broadcast.emit('msg', msg);
+        socket.broadcast.emit('movimento', msg);
     });
 
 });

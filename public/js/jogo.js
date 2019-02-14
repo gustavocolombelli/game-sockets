@@ -79,9 +79,10 @@ function gameLoop() {
     window.requestAnimationFrame(gameLoop);
     //verificar posição anterior para não repitir envios iguais
 
-    //Emitir ao servidor a posição atual do jogador
+    //Verificar se a posição atual é diferente da anterior, caso forem iguais o envio é omitido ao servidor
     if (posAnterior && (posAtual.x !== posAnterior.x || posAtual.y !== posAnterior.y)) {
-        socket.emit('msg', posAtual);
+        //Emitir ao servidor a posição atual do jogador
+        socket.emit('movimento', posAtual);
     }
 
     posAnterior.x = posAtual.x;
