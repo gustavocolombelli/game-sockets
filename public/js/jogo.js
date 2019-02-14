@@ -61,7 +61,7 @@ function release(e) {
 
 function gameLoop() {
     var div = document.querySelector('div');
-    console.log('POS ANTERIOR: ', posAnterior);
+
     if (up) {
         posAtual.y = posAtual.y - 10
     }
@@ -82,12 +82,14 @@ function gameLoop() {
     //Verificar se a posição atual é diferente da anterior, caso forem iguais o envio é omitido ao servidor
     if (posAnterior && (posAtual.x !== posAnterior.x || posAtual.y !== posAnterior.y)) {
         //Emitir ao servidor a posição atual do jogador
+
+        console.log('POS ANTERIOR: ', posAnterior, 'POS ATUAL: ', posAtual);
         socket.emit('movimento', posAtual);
     }
 
     posAnterior.x = posAtual.x;
     posAnterior.y = posAtual.y;
-    console.log('POS ATUAL: ', posAtual);
+
 }
 
 window.requestAnimationFrame(gameLoop);
