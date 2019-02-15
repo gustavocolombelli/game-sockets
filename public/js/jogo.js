@@ -5,6 +5,10 @@ var config = {
     height: 768,
     physics: {
         default: 'arcade',
+        arcade: {
+            debug: false,
+            gravity: { y:0}
+        }
     },
     scene: {
         preload: preload,
@@ -20,31 +24,34 @@ var cursors;
 
 
 var game = new Phaser.Game(config);
-let socket = io();
 
-
-var keyObj;
-keyObj = scene.input.keyboard.addKey('W');  // Get key object
-
+var mapaJogadores = {};
 function preload() {
     this.load.image('bg', 'assets/graph-verde.png');
     this.load.image('block', 'assets/formas-geometricas/ballBlue.png');
 }
 
 function create() {
+    var self = this;
+    this.socket = io.connect();
+    this.otherPlayers = this.physics.add.group();
 
-    //  Set the camera and physics bounds to be the size of 4x4 bg images
     this.cameras.main.setBounds(0, 0, 1920, 1080);
     this.physics.world.setBounds(0, 0, 1920, 1080);
 
-    //  Mash 4 images together to create our background
     this.add.image(0, 0, 'bg').setOrigin(0);
 
+    this.socket.on('novoJogador', function (novoJogador) {
+        console.log('novo jogador', novoJogador);
+        adcionarJogador(self, novoJogador);
+    });
 
 
     cursors = this.input.keyboard.createCursorKeys();
 
     player = this.physics.add.image(400, 300, 'block');
+
+
 
     player.setCollideWorldBounds(true);
 
@@ -70,8 +77,16 @@ function update() {
     }
     console.log(player.x, player.y);
     if (posAnterior && (player.x !== posAnterior.x || player.y !== posAnterior.y)) {
-        socket.emit('movimento', {x: player.x, y: player.y})
+        this.socket.emit('movimento', {x: player.x, y: player.y})
     }
     posAnterior.x = player.x;
     posAnterior.y = player.y;
 }
+
+function adcionarJogador(self, novoJogador) {
+    console.log(',',novoJogador);
+    const otherPlayer = self.add.sprite(novoJogador.x, novoJogador.y, 'block');
+    otherPlayer.playerId = novoJogador.playerID;
+    self.otherPlayers.add(otherPlayer);
+}
+
